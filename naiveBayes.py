@@ -13,45 +13,16 @@ import os, os.path
 dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
 
 
-
-
-
-def train(xTrain,yTrain):
-
-
-	nNeg = []
-	nPos = []
-	for i in range(0,14):
-		nNeg.append(0)
-		nPos.append(0)
-		for j in range(0,1400):
-			if yTrain[j] == 1:
-				nPos[i] += xTrain[j][i]
-			else:
-				nNeg[i] += xTrain[j][i]
-
-	#For each word, create P(w_k | class j)
-	PwcPos = []
-	for n_k in nPos:
-		PwcPos.append(float(n_k +1)/(sum(nPos) +14))
-
-	PwcNeg = []
-	for n_k in nNeg:
-		PwcNeg.append(float(n_k +1)/(sum(nNeg) +14))
-
-	thetaPos = []
-	for w in PwcPos:
-		thetaPos.append(w*0.5)
-
-	thetaNeg = []
-	for w in PwcNeg:
-		thetaNeg.append(w*0.5)
-
-	return (thetaPos, thetaNeg)
-
-
-
-
+def transfer(fileDj,vocabulary):
+	f = open(fileDj)
+	n = []
+	for i in range(0,len(vocabulary.keys())):
+		n.append(0)
+	for line in f:
+		for word in line.split():
+			if word in vocabulary:
+				n[sorted(dict.keys()).index(word)] += 1
+	return n
 
 def createMat():
 	dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
@@ -74,18 +45,39 @@ def createMat():
 
 	return xTrain, yTrain
 
+def train(xTrain,yTrain):
+	#create n_k = # of occurance of each word in all {pos, neg} texts
+	nNeg = []; nPos = []
+	for i in range(0,14):
+		nPos.append(0)
+		nNeg.append(0)
+		for j in range(0,1400):
+			if yTrain[j] == 1:
+				nPos[i] += xTrain[j][i]
+			else:
+				nNeg[i] += xTrain[j][i]
 
+	#For each word, create P(w_k | class j)
+	PwcPos = []; PwcNeg = []
+	for n_k in nPos:
+		PwcPos.append(float(n_k +1)/(sum(nPos) +14))
 
-def transfer(fileDj,vocabulary):
-	f = open(fileDj)
-	n = []
-	for i in range(0,len(vocabulary.keys())):
-		n.append(0)
-	for line in f:
-		for word in line.split():
-			if word in vocabulary:
-				n[sorted(dict.keys()).index(word)] += 1
-	return n
+	for n_k in nNeg:
+		PwcNeg.append(float(n_k +1)/(sum(nNeg) +14))
+
+	#theta = P(w_k | class_j)*P(class_j)	
+	thetaPos = []; thetaNeg = []
+	for w in PwcPos:
+		thetaPos.append(w*0.5)
+
+	for w in PwcNeg:
+		thetaNeg.append(w*0.5)
+
+	return (thetaPos, thetaNeg)
+
+def test(xTest,yTest):
+	
+
 
 
 
