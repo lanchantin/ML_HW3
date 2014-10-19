@@ -4,14 +4,60 @@ import numpy as np
 import math
 import random
 import os, os.path
+from sklearn.naive_bayes import MultinomialNB
 
 
+nNeg = []
+nPos = []
 #['!', '?', 'bad', 'beautiful', 'best', 'boring', 'great', 'love', 'still', 'stupid', 'superb', 'waste', 'wonderful', 'worst']
 #dict = {('love','loving','loved','loves'): 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
 #dict = {'love', 'wonderful', 'best', 'great', 'superb', 'still', 'beautiful', 'bad', 'worst','stupid', 'waste', 'boring', '?', '!'}
 
-dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0,'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
 
+
+
+textDataSetsDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW'
+#xTrain, xTest, yTrain, yTest = loadData(textDataSetsDirectoryFullPath) 
+def loadData(textDataSetsDirectoryFullPath):
+	dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+	xTrain = []
+	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath + '/training_set/pos'):
+		for filename in files:
+			fullpath = os.path.join(path, filename)
+			xTrain.append(transfer(fullpath, dict))
+
+	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath +'/training_set/neg'):
+		for filename in files:
+			fullpath = os.path.join(path, filename)
+			xTrain.append(transfer(fullpath, dict))
+
+	yTrain = []
+	for i in range(0,700):
+		yTrain.append(1)
+	for i in range(700,1400):
+		yTrain.append(-1)
+
+
+	xTest = []
+	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath + '/test_set/pos'):
+		for filename in files:
+			fullpath = os.path.join(path, filename)
+			xTest.append(transfer(fullpath, dict))
+
+	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath + '/test_set/neg'):
+		for filename in files:
+			fullpath = os.path.join(path, filename)
+			xTest.append(transfer(fullpath, dict))
+
+
+	yTest = []
+	for i in range(0,len(xTest)/2):
+		yTest.append(1)
+	for i in range(len(xTest)/2,len(xTest)):
+		yTest.append(-1)
+
+	return (xTrain, xTest, yTrain, yTest)
 
 def transfer(fileDj,vocabulary):
 	f = open(fileDj)
@@ -24,30 +70,9 @@ def transfer(fileDj,vocabulary):
 				n[sorted(dict.keys()).index(word)] += 1
 	return n
 
-def createMat():
-	dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
-	xTrain = []
-	for path, dirs, files in os.walk('training_set/pos'):
-		for filename in files:
-			fullpath = os.path.join(path, filename)
-			xTrain.append(transfer(fullpath, dict))
-
-	for path, dirs, files in os.walk('training_set/neg'):
-		for filename in files:
-			fullpath = os.path.join(path, filename)
-			xTrain.append(transfer(fullpath, dict))
-
-	yTrain = []
-	for i in range(0,700):
-		yTrain.append(1)
-	for i in range(700,1400):
-		yTrain.append(-1)
-
-	return xTrain, yTrain
-
 def train(xTrain,yTrain):
 	#create n_k = # of occurance of each word in all {pos, neg} texts
-	nNeg = []; nPos = []
+	global nNeg; global nPos
 	for i in range(0,14):
 		nPos.append(0)
 		nNeg.append(0)
@@ -73,13 +98,49 @@ def train(xTrain,yTrain):
 	for w in PwcNeg:
 		thetaNeg.append(w*0.5)
 
+
 	return (thetaPos, thetaNeg)
 
-def test(xTest,yTest):
-	
+# def test(xTest,yTest):
+	#argmax log P(class j) + sum(log(P(xi | class j)))
+
+	#Math.log(0.5) + 
+
+	# sum = 0
+	# for i in range(0,14):
+	# 	if xTest[i] > 0:
+	# 		sum += thetaPos[i]
+
+
+def testDirectOne(XtestTextFileNameInFullPathOne):
+	vocabulary = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+	f = open(XtestTextFileNameInFullPathOne)
+	pNeg = []
+	pPos = []
+	i = 0
+	for line in f:
+		for word in line.split():
+			if word in vocabulary:
+				pPos.append(0)
+				pNeg.append(0)
+				pPos[i] = math.log(float(nPos[sorted(vocabulary.keys()).index(word)]) / sum(nPos))
+				pNeg[i] = math.log(float(nNeg[sorted(vocabulary.keys()).index(word)]) / sum(nNeg))
+				i += 1
+	print sum(pPos)
+	print sum(pNeg)
+
+	if sum(pPos) > sum(pNeg):
+		return 1
+	else
+		return -1
 
 
 
+
+
+# clf = MultinomialNB()
+# clf.fit(xTrain, yTrain)
+# clf.score(xTrain,yTrain)
 
 	# numNegatives = len([name for name in os.listdir('training_set/neg/') if os.path.isfile(os.path.join('training_set/neg/', name))])
 	# numPositives = len([name for name in os.listdir('training_set/pos/') if os.path.isfile(os.path.join('training_set/pos/', name))])
