@@ -9,12 +9,13 @@ from sklearn.naive_bayes import MultinomialNB
 
 nNeg = []
 nPos = []
+thetaPos = []
+thetaNeg = []
 #['!', '?', 'bad', 'beautiful', 'best', 'boring', 'great', 'love', 'still', 'stupid', 'superb', 'waste', 'wonderful', 'worst']
 #dict = {('love','loving','loved','loves'): 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
 #dict = {'love', 'wonderful', 'best', 'great', 'superb', 'still', 'beautiful', 'bad', 'worst','stupid', 'waste', 'boring', '?', '!'}
 
 dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0,'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
-
 
 
 textDataSetsDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW'
@@ -38,7 +39,6 @@ def loadData(textDataSetsDirectoryFullPath):
 	for i in range(700,1400):
 		yTrain.append(-1)
 
-
 	xTest = []
 	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath + '/test_set/pos'):
 		for filename in files:
@@ -49,7 +49,6 @@ def loadData(textDataSetsDirectoryFullPath):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
 			xTest.append(transfer(fullpath, dict))
-
 
 	yTest = []
 	for i in range(0,len(xTest)/2):
@@ -72,7 +71,7 @@ def transfer(fileDj,vocabulary):
 
 def train(xTrain,yTrain):
 	#create n_k = # of occurance of each word in all {pos, neg} texts
-	global nNeg; global nPos
+	global nNeg; global nPos;
 	for i in range(0,14):
 		nPos.append(0)
 		nNeg.append(0)
@@ -91,7 +90,7 @@ def train(xTrain,yTrain):
 		PwcNeg.append(float(n_k +1)/(sum(nNeg) +14))
 
 	#theta = P(w_k | class_j)*P(class_j)	
-	thetaPos = []; thetaNeg = []
+	global thetaPos; global thetaNeg;
 	for w in PwcPos:
 		thetaPos.append(w*0.5)
 
@@ -101,15 +100,34 @@ def train(xTrain,yTrain):
 
 	return (thetaPos, thetaNeg)
 
-# def test(xTest,yTest):
+def test(xTest,yTest):
 	#argmax log P(class j) + sum(log(P(xi | class j)))
+	yPredict = []
+	e = 0
+	for r in xTest:
+		posSum = 0
+		negSum = 0
+		i = 0
+		for c in r:
+			for k in range(0,c):
+				posSum += math.log(thetaPos[i])
+				negSum += math.log(thetaNeg[i])
+			i+=1
+		yPredict.append(0)
+		if posSum > negSum:
+			yPredict[e] = 1
+		else:
+			yPredict[e] = -1
+		e += 1
 
-	#Math.log(0.5) + 
+	classSum = 0
+	for i in range(0,len(yPredict)):
+		if yPredict[i] == yTest[i]:
+			classSum += 1
 
-	# sum = 0
-	# for i in range(0,14):
-	# 	if xTest[i] > 0:
-	# 		sum += thetaPos[i]
+	accuracy = float(classSum)/len(yPredict)		
+
+	return yPredict, accuracy
 
 
 def testDirectOne(XtestTextFileNameInFullPathOne):
@@ -131,11 +149,18 @@ def testDirectOne(XtestTextFileNameInFullPathOne):
 
 	if sum(pPos) > sum(pNeg):
 		return 1
-	else
+	else:
 		return -1
 
 
 
+def debug():
+	textDataSetsDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW/'
+	Xtrain, Xtest, ytrain, ytest = naiveBayesMulFeature.loadData(textDataSetsDirectoryFullPath)
+	thetaPos, thetaNeg = naiveBayesMulFeature.train(Xtrain, ytrain)
+	yPredict, Accuracy = naiveBayesMulFeature.test(Xtest, ytest)
+
+#def testDirect(testFileDirectoryFullPath):
 
 
 # clf = MultinomialNB()
@@ -169,3 +194,5 @@ def testDirectOne(XtestTextFileNameInFullPathOne):
 	# 		nNeg = []
 	# 		for key in sorted(dict.keys()):
 	# 			nNeg.append(dict[key])
+
+
