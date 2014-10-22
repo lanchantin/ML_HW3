@@ -85,21 +85,14 @@ def train(xTrain,yTrain):
 				nNeg[i] += xTrain[j][i]
 
 	#For each word, create P(w_k | class j)
-	PwcPos = []; PwcNeg = []
+	global thetaPos; global thetaNeg;
+	thetaPos = []; thetaNeg = [];
+	
 	for n_k in nPos:
-		PwcPos.append(float(n_k +1)/(sum(nPos) +14))
+		thetaPos.append((float(n_k +1)/(sum(nPos) + 14))*0.5)
 
 	for n_k in nNeg:
-		PwcNeg.append(float(n_k +1)/(sum(nNeg) +14))
-
-	#theta = P(w_k | class_j)*P(class_j)	 
-	global thetaPos; global thetaNeg;
-	for w in PwcPos:
-		thetaPos.append(w*0.5)
-
-	for w in PwcNeg:
-		thetaNeg.append(w*0.5)
-
+		thetaNeg.append((float(n_k +1)/(sum(nNeg) + 14))*0.5)
 
 	return (thetaPos, thetaNeg)
 
@@ -187,21 +180,16 @@ def train2(xTrain,yTrain):
 					nNeg[i] += 1
 
 	#For each word, create P(w_k | class j)
-	PwcPos = []; PwcNeg = []
-	for n_k in nPos:
-		PwcPos.append(float(n_k +1)/(700 +2))
-
-	for n_k in nNeg:
-		PwcNeg.append(float(n_k +1)/(700 +2))
-
-	#theta = P(w_k | class_j)*P(class_j)	
 	global thetaPosTrue ; global thetaNegTrue;
 	thetaPosTrue = []; thetaNegTrue = [];
-	for w in PwcPos:
-		thetaPosTrue.append(w*0.5)
 
-	for w in PwcNeg:
-		thetaNegTrue.append(w*0.5)
+	for n_k in nPos:
+		PwcPos = (float(n_k +1)/(700 +2))
+		thetaPosTrue.append(PwcPos*0.5)
+
+	for n_k in nNeg:
+		PwcNeg = (float(n_k +1)/(700 +2))
+		thetaNegTrue.append(PwcNeg*0.5)
 
 
 	return (thetaPosTrue, thetaNegTrue)
