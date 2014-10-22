@@ -17,23 +17,23 @@ thetaNegTrue = []
 #dict = {('love','loving','loved','loves'): 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
 #dict = {'love', 'wonderful', 'best', 'great', 'superb', 'still', 'beautiful', 'bad', 'worst','stupid', 'waste', 'boring', '?', '!'}
 
-dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0,'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+vocabulary = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0,'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
 
 
 textDataSetsDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW'
 #xTrain, xTest, yTrain, yTest = loadData(textDataSetsDirectoryFullPath) 
 def loadData(textDataSetsDirectoryFullPath):
-	dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+	global vocabulary
 	xTrain = []
 	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath + 'training_set/pos'):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
-			xTrain.append(transfer(fullpath, dict))
+			xTrain.append(transfer(fullpath, vocabulary))
 
 	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath +'training_set/neg'):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
-			xTrain.append(transfer(fullpath, dict))
+			xTrain.append(transfer(fullpath, vocabulary))
 
 	yTrain = []
 	for i in range(0,700):
@@ -45,12 +45,12 @@ def loadData(textDataSetsDirectoryFullPath):
 	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath + 'test_set/pos'):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
-			xTest.append(transfer(fullpath, dict))
+			xTest.append(transfer(fullpath, vocabulary))
 
 	for path, dirs, files in os.walk(textDataSetsDirectoryFullPath + 'test_set/neg'):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
-			xTest.append(transfer(fullpath, dict))
+			xTest.append(transfer(fullpath, vocabulary))
 
 	yTest = []
 	for i in range(0,len(xTest)/2):
@@ -68,7 +68,7 @@ def transfer(fileDj,vocabulary):
 	for line in f:
 		for word in line.split():
 			if word in vocabulary:
-				n[sorted(dict.keys()).index(word)] += 1
+				n[sorted(vocabulary.keys()).index(word)] += 1
 	return n
 
 def train(xTrain,yTrain):
@@ -92,7 +92,7 @@ def train(xTrain,yTrain):
 	for n_k in nNeg:
 		PwcNeg.append(float(n_k +1)/(sum(nNeg) +14))
 
-	#theta = P(w_k | class_j)*P(class_j)	
+	#theta = P(w_k | class_j)*P(class_j)	 
 	global thetaPos; global thetaNeg;
 	for w in PwcPos:
 		thetaPos.append(w*0.5)
@@ -131,7 +131,7 @@ def test(xTest,yTest):
 
 
 def testDirectOne(XtestTextFileNameInFullPathOne):
-	vocabulary = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+	global vocabulary
 	f = open(XtestTextFileNameInFullPathOne)
 	pNeg = []
 	pPos = []
@@ -150,7 +150,7 @@ def testDirectOne(XtestTextFileNameInFullPathOne):
 	
 
 def testDirect(testFileDirectoryFullPath):
-	dict = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+	global vocabulary
 	yPredict = []
 	k = 0
 	accuracy = 0
@@ -238,9 +238,9 @@ def debug():
 	testFileDirectoryFullPath = '/Users/Jack/GitHub/ML_HW3/test_set/'
 	Xtrain, Xtest, ytrain, ytest = naiveBayesMulFeature.loadData(textDataSetsDirectoryFullPath)
 	thetaPos, thetaNeg = naiveBayesMulFeature.train(Xtrain, ytrain)
-	yPredict, Accuracy = naiveBayesMulFeature.test(Xtest, ytest)
-	yPredict, Accuracy = naiveBayesMulFeature.testDirect(testFileDirectoryFullPath)
+	yPredict1, Accuracy1 = naiveBayesMulFeature.test(Xtest, ytest)
+	yPredict2, Accuracy2 = naiveBayesMulFeature.testDirect(testFileDirectoryFullPath)
 	thetaPosTrue, thetaNegTrue= naiveBayesMulFeature.train2(Xtrain, ytrain)
-	yPredict, Accuracy= naiveBayesMulFeature.test2(Xtest, ytest)
+	yPredict3, Accuracy3 = naiveBayesMulFeature.test2(Xtest, ytest)
 
 
