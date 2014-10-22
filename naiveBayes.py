@@ -17,11 +17,25 @@ thetaNegTrue = []
 #dict = {('love','loving','loved','loves'): 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
 #dict = {'love', 'wonderful', 'best', 'great', 'superb', 'still', 'beautiful', 'bad', 'worst','stupid', 'waste', 'boring', '?', '!'}
 
-vocabulary = {'love': 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0,'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
+vocabulary = {'love': 0, 'loved': 0, 'loves': 0, 'loving': 0, 'wonderful': 1, 'best' :2, 'great': 3, 'superb': 4, 'still': 5, 'beautiful': 6, 'bad': 7,'worst': 8,'stupid': 9, 'waste': 10, 'boring': 11, '?': 12, '!': 13}
 
+######
+##Q2##
+######
+def transfer(fileDj,vocabulary):
+	f = open(fileDj)
+	n = []
+	for i in range(0,14):
+		n.append(0)
+	for line in f:
+		for word in line.split():
+			if word in vocabulary:
+				n[vocabulary.get(word)] += 1
+	return n
 
-textDataSetsDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW'
-#xTrain, xTest, yTrain, yTest = loadData(textDataSetsDirectoryFullPath) 
+######
+##Q3##
+######
 def loadData(textDataSetsDirectoryFullPath):
 	global vocabulary
 	xTrain = []
@@ -60,17 +74,10 @@ def loadData(textDataSetsDirectoryFullPath):
 
 	return (xTrain, xTest, yTrain, yTest)
 
-def transfer(fileDj,vocabulary):
-	f = open(fileDj)
-	n = []
-	for i in range(0,len(vocabulary.keys())):
-		n.append(0)
-	for line in f:
-		for word in line.split():
-			if word in vocabulary:
-				n[sorted(vocabulary.keys()).index(word)] += 1
-	return n
 
+######
+##Q4##
+######
 def train(xTrain,yTrain):
 	#create n_k = # of occurance of each word in all {pos, neg} texts
 	global nNeg; global nPos;
@@ -96,6 +103,9 @@ def train(xTrain,yTrain):
 
 	return (thetaPos, thetaNeg)
 
+######
+##Q6##
+######
 def test(xTest,yTest):
 	#argmax log P(class j) + sum(log(P(xi | class j)))
 	yPredict = []
@@ -123,17 +133,20 @@ def test(xTest,yTest):
 	return yPredict, accuracy
 
 
-def testDirectOne(XtestTextFileNameInFullPathOne):
+######
+##Q8##
+######
+def testDirectOne(xTestTextFileNameInFullPathOne):
 	global vocabulary
-	f = open(XtestTextFileNameInFullPathOne)
+	f = open(xTestTextFileNameInFullPathOne)
 	pNeg = []
 	pPos = []
 	i = 0
 	for line in f:
 		for word in line.split():
 			if word in vocabulary:
-				pPos.append(math.log(float(nPos[sorted(vocabulary.keys()).index(word)]) / sum(nPos)))
-				pNeg.append(math.log(float(nNeg[sorted(vocabulary.keys()).index(word)]) / sum(nNeg)))
+				pPos.append(math.log(float(nPos[vocabulary.get(word)]) / sum(nPos)))
+				pNeg.append(math.log(float(nNeg[vocabulary.get(word)]) / sum(nNeg)))
 				i += 1
 
 	if sum(pPos) > sum(pNeg):
@@ -141,7 +154,9 @@ def testDirectOne(XtestTextFileNameInFullPathOne):
 	else:
 		return -1
 	
-
+######
+##Q9##
+######
 def testDirect(testFileDirectoryFullPath):
 	global vocabulary
 	yPredict = []
@@ -154,6 +169,7 @@ def testDirect(testFileDirectoryFullPath):
 			if yPredict[k] == 1:
 				accuracy += 1;
 			k += 1
+
 	for path, dirs, files in os.walk(testFileDirectoryFullPath + 'neg'):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
@@ -221,14 +237,26 @@ def test2(xTest,yTest):
 	return yPredict, accuracy
 
 def debug():
-	# textDataSetsDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW/'
+	textDataSetsDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW/'
+	testFileDirectoryFullPath = '/net/if24/jjl5sw/GitHub/ML_HW/test_set/'
 	textDataSetsDirectoryFullPath = '/Users/Jack/GitHub/ML_HW3/'
 	testFileDirectoryFullPath = '/Users/Jack/GitHub/ML_HW3/test_set/'
-	Xtrain, Xtest, ytrain, ytest = naiveBayesMulFeature.loadData(textDataSetsDirectoryFullPath)
-	thetaPos, thetaNeg = naiveBayesMulFeature.train(Xtrain, ytrain)
-	yPredict1, Accuracy1 = naiveBayesMulFeature.test(Xtest, ytest)
+
+	xTrain, xTest, yTrain, yTest = naiveBayesMulFeature.loadData(textDataSetsDirectoryFullPath)
+	thetaPos, thetaNeg = naiveBayesMulFeature.train(xTrain, yTrain)
+	yPredict1, Accuracy1 = naiveBayesMulFeature.test(xTest, yTest)
 	yPredict2, Accuracy2 = naiveBayesMulFeature.testDirect(testFileDirectoryFullPath)
-	thetaPosTrue, thetaNegTrue= naiveBayesMulFeature.train2(Xtrain, ytrain)
-	yPredict3, Accuracy3 = naiveBayesMulFeature.test2(Xtest, ytest)
+	thetaPosTrue, thetaNegTrue= naiveBayesMulFeature.train2(xTrain, yTrain)
+	yPredict3, Accuracy3 = naiveBayesMulFeature.test2(xTest, yTest)
 
 
+	xTrain, xTest, yTrain, yTest = loadData(textDataSetsDirectoryFullPath)
+	thetaPos, thetaNeg = train(xTrain, yTrain)
+	yPredict1, Accuracy1 = test(xTest, yTest)
+	yPredict2, Accuracy2 = testDirect(testFileDirectoryFullPath)
+	thetaPosTrue, thetaNegTrue= train2(xTrain, yTrain)
+	yPredict3, Accuracy3 = test2(xTest, yTest)
+
+	clf = MultinomialNB()
+	clf.fit(xTrain, yTrain)
+	clf.score(xTrain,yTrain)
