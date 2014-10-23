@@ -109,12 +109,12 @@ def train(xTrain,yTrain):
 def test(xTest,yTest):
 	#argmax log P(class j) + sum(log(P(xi | class j)))
 	yPredict = []
-	for r in xTest:
+	for row in xTest:
 		posSum = 0
 		negSum = 0
 		i = 0
-		for c in r:
-			for k in range(0,c):
+		for column in row:
+			for k in range(0,column):
 				posSum += (math.log(thetaPos[i]) + math.log(0.5))
 				negSum += (math.log(thetaNeg[i]) + math.log(0.5))
 			i+=1
@@ -160,27 +160,27 @@ def testDirectOne(xTestTextFileNameInFullPathOne):
 def testDirect(testFileDirectoryFullPath):
 	global vocabulary
 	yPredict = []
-	k = 0
 	accuracy = 0
 	for path, dirs, files in os.walk(testFileDirectoryFullPath + 'pos'):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
 			yPredict.append(testDirectOne(fullpath))
-			if yPredict[k] == 1:
+			if yPredict[-1] == 1:
 				accuracy += 1;
-			k += 1
 
 	for path, dirs, files in os.walk(testFileDirectoryFullPath + 'neg'):
 		for filename in files:
 			fullpath = os.path.join(path, filename)
 			yPredict.append(testDirectOne(fullpath))
-			if yPredict[k] == -1:
+			if yPredict[-1] == -1:
 				accuracy += 1;
-			k += 1
 
 	accuracy = float(accuracy)/len(yPredict)
 	return yPredict, accuracy
 
+#######
+##Q10##
+#######
 def train2(xTrain,yTrain):
 	global nNeg; global nPos;
 	nNeg = []; nPos = []
@@ -210,6 +210,9 @@ def train2(xTrain,yTrain):
 
 	return (thetaPosTrue, thetaNegTrue)
 
+#######
+##Q11##
+#######
 def test2(xTest,yTest):
 	#argmax log P(class j) + sum(log(P(xi | class j)))
 	yPredict = []
@@ -260,3 +263,4 @@ def debug():
 	clf = MultinomialNB()
 	clf.fit(xTrain, yTrain)
 	clf.score(xTrain,yTrain)
+
