@@ -14,8 +14,6 @@ thetaNeg = []
 thetaPosTrue = []
 thetaNegTrue = []
 #['!', '?', 'bad', 'beautiful', 'best', 'boring', 'great', 'love', 'still', 'stupid', 'superb', 'waste', 'wonderful', 'worst']
-#dict = {('love','loving','loved','loves'): 0, 'wonderful': 0, 'best' :0, 'great': 0, 'superb': 0, 'still': 0, 'beautiful': 0, 'bad': 0, 'worst': 0,'stupid': 0, 'waste': 0, 'boring': 0, '?': 0, '!': 0}
-#dict = {'love', 'wonderful', 'best', 'great', 'superb', 'still', 'beautiful', 'bad', 'worst','stupid', 'waste', 'boring', '?', '!'}
 
 vocabulary = {'love': 0, 'loved': 0, 'loves': 0, 'loving': 0, 'wonderful': 1, 'best' :2, 'great': 3, 'superb': 4, 'still': 5, 'beautiful': 6, 'bad': 7,'worst': 8,'stupid': 9, 'waste': 10, 'boring': 11, '?': 12, '!': 13}
 
@@ -118,7 +116,7 @@ def test(xTest,yTest):
 				posSum += (math.log(thetaPos[i]) + math.log(0.5))
 				negSum += (math.log(thetaNeg[i]) + math.log(0.5))
 			i+=1
-		if posSum > negSum:
+		if posSum >= negSum:
 			yPredict.append(1)
 		else:
 			yPredict.append(-1)
@@ -149,7 +147,7 @@ def testDirectOne(xTestTextFileNameInFullPathOne):
 				pNeg.append(math.log(float(nNeg[vocabulary.get(word)]) / sum(nNeg)))
 				i += 1
 
-	if sum(pPos) > sum(pNeg):
+	if sum(pPos) >= sum(pNeg):
 		return 1
 	else:
 		return -1
@@ -225,7 +223,7 @@ def test2(xTest,yTest):
 				posSum += (math.log(thetaPosTrue[i]) + math.log(0.5))
 				negSum += (math.log(thetaNegTrue[i]) + math.log(0.5))
 			i+=1
-		if posSum > negSum:
+		if posSum >= negSum:
 			yPredict.append(1)
 		else:
 			yPredict.append(-1)
