@@ -21,8 +21,6 @@ thetaNegTrue = []
 vocabulary = {'love': 0, 'loved': 0, 'loves': 0, 'loving': 0, 'wonderful': 1, 'best' :2, 'great': 3, 'superb': 4, 'still': 5, 'beautiful': 6, 'bad': 7,'worst': 8,'stupid': 9, 'waste': 10, 'boring': 11, '?': 12, '!': 13}
 
 
-
-
 ###################################
 ##### multivariate classifier #####
 ###################################
@@ -268,12 +266,11 @@ def main():
 	thetaPosTrue, thetaNegTrue= naiveBayesBernFeature.train(xTrain, yTrain)
 	yPredict3, Accuracy3 = naiveBayesBernFeature.test(xTest, yTest)
 
-	print
-	print ("thetaPos:")
+
+	print ("\nthetaPos:")
 	for theta_k in thetaPos:
 		print theta_k
-	print
-	print ("thetaNeg:")
+	print ("\nthetaNeg:")
 	for theta_k in thetaNeg:
 		print theta_k
 	print '\n**************************************************************\n'
@@ -287,8 +284,7 @@ def main():
 	print ("thetaPosTrue:")
 	for theta_k in thetaPosTrue:
 		print theta_k
-	print
-	print ("thetaNegTrue:")
+	print ("\nthetaNegTrue:")
 	for theta_k in thetaNegTrue:
 		print theta_k
 	print '\n**************************************************************\n'
